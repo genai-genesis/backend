@@ -7,7 +7,7 @@ const {
 
 const express = require("express")
 
-const authRouter = express.Route()
+const authRouter = express.Router()
 
 authRouter.post("/login", logUserIn)
 authRouter.post("/signup", createUser)
