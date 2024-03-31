@@ -12,41 +12,48 @@ const cloudinary = require("cloudinary").v2
  */
 
 // for uploading the RECIPE image, NOT THE RECIEPT (we don't need to actually upload that since we aren't storing it)
-  const uploadImage = async (req, res, next) => {
-    const { username, recipe_name, recipe } = req.body;
-    const image = req.file; // Assuming the image is sent as a file
-  
-    const user = await User.findOne({ username });
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
+const uploadImage = async (req, res) => {
+    // Decoding user's username from the token
+    const decoded = jwt.decode(
+      req.headers["x-access-token"],
+      process.env.JWT_SECRET
+    )
+    if (!decoded) {
+      return res.status(401).json({ error: "Unauthorized" })
+    }
+    console.log(decoded)
+    //We use the username to find the user id
+    const userId = await User.findOne()
+      .where("username")
+      .equals(decoded.username)
+      .select("_id")
+      .exec()
+    console.log(userId)
+    if (userId == null) {
+      return res
+        .status(404)
+        .send({ message: "Not logged in. Please Login again" })
     }
   
-    const newImage = new Image({
-      username,
-      recipe_name,
-      recipe,
-      image: image.path // Assuming the image path is stored
-    });
+    try {
+      const imageToUpload = req.file
+      const uploadUrl = await uploadToCloudinary(req.file.buffer)
   
-    const savedImage = await newImage.save();
-    res.json(savedImage);
-  };
-
-
-// for getting the RECIPE image.
-  const getImage = async (req, res, next) => {
-    console.log('getImage called');
-    const { username } = req.query; // Assuming the username is sent as a query parameter
+      let image = new Image({
+        image: uploadUrl,
+        owner_id: userId._id,
+        likes: 0,
+      })
+      await image.save()
   
-    const image = await Image.findOne({ username });
-    if (!image) {
-      return res.status(404).json({ error: 'Image not found' });
+      res.status(200).send({ message: "success" })
+    } catch (err) {
+      console.error(err)
+  
+      return res.status(500).send({ message: "Service Error" })
     }
-  
-    res.json(image.image);
-  };
+  }
 
 module.exports = {
   uploadImage,
-  getImage,
 }

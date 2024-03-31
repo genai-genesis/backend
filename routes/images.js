@@ -11,7 +11,6 @@ const express = require("express")
 const imagesRouter = express.Router()
 
 // Need to pass user token in x-access-token
-imagesRouter.get("/recipeImage", getImage)
 imagesRouter.post("/upload", upload.single("image"), uploadImage)
 
 module.exports = {
