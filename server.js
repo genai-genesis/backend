@@ -1,29 +1,44 @@
 // variable declarations
-const port = 8080;
 const express = require('express');
+const bp = require("body-parser");
+const app = express();
+const mongoose = require('mongoose')
 const cors = require("cors");
-const bodyParser = require("body-parser")
+const userRouter = require('./routes/user.route')
+
 require("dotenv").config();
 // const { configureLibs } = require("./helpers/setup");
 // const { authRouter } = require("./routes/users");
 // const { imagesRouter } = require("./routes/images");
 
-configureLibs()
-    .then(() => console.log("Success configuring libraries!"))
-    .catch((e) => console.error(e))
 
-const app = express();
+const port = process.env.PORT || 8080
 
-// call middleware
-app.use(
-    cors({
-        allowedHeaders: ["Content-Type", "x-access-token"],
-    })
-)
+const uri = process.env.ATLAS_URI
+mongoose.connect(uri, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    socketTimeoutMS: 1000 * 20,
+    connectTimeoutMS: 1000 * 20,
+})
 
-app.use(bodyParser.json());
+const connection = mongoose.connection
+connection.once('open', () => {
+    console.log('MongoDB database connection established successfully')
+})
+
+
+app.use(cors({
+    origin: '*', // Allow all origins
+    credentials: true // Accept credentials (cookies) on the backend
+}));
+app.use(express.json())
+app.use(bp.urlencoded({ extended: true }));
 
 // routes, user authentication for each page probably
-app.use("/users", authRouter);
-app.use("/images", imagesRouter);
-app.use()
+app.use('/user', userRouter);
+
+//listener
+app.listen(port, () => {
+    console.log(`Server is running on port ${port}`)
+  })
