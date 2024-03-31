@@ -46,7 +46,7 @@ const uploadImage = async (req, res) => {
       })
       await image.save()
   
-      res.status(200).send({ message: "success" })
+      res.status(200).send({ message: "Image uploaded successfully", imageUrl: uploadUrl });
     } catch (err) {
       console.error(err)
   
