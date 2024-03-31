@@ -7,11 +7,13 @@ const {
 
 const express = require("express")
 
-const authRouter = express.Router()
+const authRouter = express.Route()
 
 authRouter.post("/login", logUserIn)
 authRouter.post("/signup", createUser)
-authRouter.get("/getfridge", getItems)
+// authRouter.get("/getfridge", getItems)
+authRouter.get('/items/:username', getItems);
+
 authRouter.post("/additem", addItems)
 module.exports = {
   authRouter,
