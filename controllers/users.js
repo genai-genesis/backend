@@ -20,7 +20,7 @@ const createUser = async (req, res) => {
       return res.status(404).send({ message: "Invalid Information" })
     }
     const hashedPassword = await bcrypt.hash(password, 10)
-    const user = new User({ username, password: hashedPassword, items: new Map()})
+    const user = new User({ username, password: hashedPassword, items: {}})
 
     const token = jwt.sign(
       {
@@ -83,10 +83,7 @@ const logUserIn = async (req, res) => {
 
 const getItems = async (req, res) => {
   try {
-    const { username} = req.body
-    const user = await User.findOne().where("username").equals(username).exec()
-
-    // const user = await User.findById(req.user.id); // is the user's ID stored in req.user.id
+    const user = await User.findById(req.user.id); // is the user's ID stored in req.user.id
     if (!user) {
       return res.status(404).send({ message: "User not found" });
     }
@@ -98,26 +95,20 @@ const getItems = async (req, res) => {
 };
 
 const addItems = async (req, res) => {
-  const { username,newItems } = req.body; // newItems should be an object with item names as keys and quantities as values
-  // const { username} = req.body
-  try {
-    // const user = await User.findOne().where("username").equals(username).exec()
-    const user = await User.findOne({ username }).exec(); // Simpler way to find a user by username
+  const { newItems } = req.body; // newItems should be an object with item names as keys and quantities as values
 
+  try {
+    const user = await User.findById(req.user.id);
     if (!user) {
       return res.status(404).send({ message: "User not found" });
     }
     
-    for (const [itemName, date] of Object.entries(newItems)) {
-      user.items.set(itemName, date);
+    for (const [item, quantity] of Object.entries(newItems)) {
+      user.items.set(item, quantity);
     }
     
-    user.markModified('items');
-
     await user.save();
-    // res.status(200).send(user.items);
-    res.status(200).send({ items: Array.from(user.items) }); // Convert Map to Array to send back
-
+    res.status(200).send(user.items);
   } catch (err) {
     console.error(err.message);
     res.status(500).send({ message: "Server error while adding items" });
@@ -131,4 +122,4 @@ module.exports = {
   createUser,
   getItems,
   addItems
-};
+}
