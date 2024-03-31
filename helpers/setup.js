@@ -4,7 +4,7 @@ const configureLibs = async () => {
   await setupMongo();
   cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
+    api_key: '759586126363323',
     api_secret: process.env.CLOUDINARY_API_SECRET,
   });
 };
