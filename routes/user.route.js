@@ -2,7 +2,7 @@ const {createUserController, getUserController, getUserByEmailController} = requ
 
 const router = require ('express').Router();
 
-router.post('/', createUserController);
+router.post('/create', createUserController);
 router.get('/user', getUserController);
 router.get('/email', getUserByEmailController);
 
