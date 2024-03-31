@@ -4,12 +4,10 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const app = express();
 const { authRouter } = require('./routes/users');
-// const { imagesRouter } = require('./routes/images');
+const { imagesRouter } = require('./routes/images');
 require("dotenv").config();
 
 const { configureLibs } = require("./helpers/setup");
-const { authRouter } = require("./routes/users");
-const { imagesRouter } = require("./routes/images");
 
 
 const port = process.env.PORT || 8080
@@ -28,7 +26,7 @@ app.use(
 
 // routes, user authentication for each page probably
 app.use('/users', authRouter);
-// app.use("/images", imagesRouter);
+app.use("/images", imagesRouter);
 
 // listener
 app.listen(port, () => {

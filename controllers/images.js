@@ -11,30 +11,40 @@ const cloudinary = require("cloudinary").v2
  * @returns
  */
 
-
 // for uploading the RECIPE image, NOT THE RECIEPT (we don't need to actually upload that since we aren't storing it)
-const uploadImage = async (username, recipe_name, recipe, image) => {
-    const user = await User.findOne({ username: username });
+  const uploadImage = async (req, res, next) => {
+    const { username, recipe_name, recipe } = req.body;
+    const image = req.file; // Assuming the image is sent as a file
+  
+    const user = await User.findOne({ username });
     if (!user) {
-      throw new Error('User not found');
+      return res.status(404).json({ error: 'User not found' });
     }
   
     const newImage = new Image({
       username,
       recipe_name,
       recipe,
-      image
+      image: image.path // Assuming the image path is stored
     });
   
-    return await newImage.save();
+    const savedImage = await newImage.save();
+    res.json(savedImage);
   };
 
- // for getting the RECIPE image.
- const getImage = async (username) => {
-    const image = await Image.findOne({ username: username });
-    return image ? image.image : null;
-  };
 
+// for getting the RECIPE image.
+  const getImage = async (req, res, next) => {
+    console.log('getImage called');
+    const { username } = req.query; // Assuming the username is sent as a query parameter
+  
+    const image = await Image.findOne({ username });
+    if (!image) {
+      return res.status(404).json({ error: 'Image not found' });
+    }
+  
+    res.json(image.image);
+  };
 
 module.exports = {
   uploadImage,
