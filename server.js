@@ -8,8 +8,8 @@ const { authRouter } = require('./routes/users');
 require("dotenv").config();
 
 const { configureLibs } = require("./helpers/setup");
-// const { authRouter } = require("./routes/users");
-// const { imagesRouter } = require("./routes/images");
+const { authRouter } = require("./routes/users");
+const { imagesRouter } = require("./routes/images");
 
 
 const port = process.env.PORT || 8080
