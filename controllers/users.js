@@ -20,12 +20,13 @@ const createUser = async (req, res) => {
       return res.status(404).send({ message: "Invalid Information" })
     }
     const hashedPassword = await bcrypt.hash(password, 10)
-    const user = new User({ password: hashedPassword, username })
+    const user = new User({ username, password: hashedPassword, items: {}})
 
     const token = jwt.sign(
       {
         username,
         hashedPassword,
+  
       },
       process.env.JWT_SECRET
     )
@@ -79,7 +80,46 @@ const logUserIn = async (req, res) => {
   }
 }
 
+
+const getItems = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id); // is the user's ID stored in req.user.id
+    if (!user) {
+      return res.status(404).send({ message: "User not found" });
+    }
+    res.status(200).send(user.items);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send({ message: "Server error while retrieving items" });
+  }
+};
+
+const addItems = async (req, res) => {
+  const { newItems } = req.body; // newItems should be an object with item names as keys and quantities as values
+
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).send({ message: "User not found" });
+    }
+    
+    for (const [item, quantity] of Object.entries(newItems)) {
+      user.items.set(item, quantity);
+    }
+    
+    await user.save();
+    res.status(200).send(user.items);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send({ message: "Server error while adding items" });
+  }
+};
+
+
+
 module.exports = {
   logUserIn,
   createUser,
-}
+  getItems,
+  addItems
+};
