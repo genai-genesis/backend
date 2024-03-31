@@ -1,4 +1,4 @@
-const{createUser, getUser, getUserByEmail} = require('../controllers/user.controller');
+const {createUser, getUser, getUserByEmail} = require('../services/user.service');
 
 const createUserController = (req, res) => {
     console.log(req.body)
