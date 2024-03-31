@@ -1,9 +1,10 @@
 // variable declarations
 const express = require('express');
-const bp = require("body-parser");
-const app = express();
-const mongoose = require('mongoose')
 const cors = require("cors");
+const bp = require("body-parser");
+require("dotenv").config()
+
+const app = express();
 const userRouter = require('./routes/user.route')
 
 require("dotenv").config();
